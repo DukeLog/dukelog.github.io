@@ -1,3 +1,45 @@
+// Navigation handling
+document.addEventListener('DOMContentLoaded', () => {
+    const startPage = document.getElementById('start-page');
+    const quizContainer = document.getElementById('quiz-container');
+    const tableContainer = document.getElementById('table-container');
+    
+    // Button elements
+    const startQuizBtn = document.getElementById('start-quiz');
+    const showTableBtn = document.getElementById('show-table');
+    const backToStartBtns = document.querySelectorAll('#back-to-start');
+    
+    let quizInstance = null;
+
+    // Navigation functions
+    function showPage(pageToShow) {
+        [startPage, quizContainer, tableContainer].forEach(page => {
+            page.style.display = 'none';
+        });
+        pageToShow.style.display = 'block';
+    }
+
+    // Event listeners for navigation
+    startQuizBtn.addEventListener('click', () => {
+        showPage(quizContainer);
+        if (!quizInstance) {
+            quizInstance = new MultiplicationPractice();
+        } else {
+            quizInstance.generateNewProblems();
+        }
+    });
+
+    showTableBtn.addEventListener('click', () => {
+        showPage(tableContainer);
+    });
+
+    backToStartBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            showPage(startPage);
+        });
+    });
+});
+
 class MultiplicationPractice {
     constructor() {
         this.currentTaskIndex = 0;
@@ -59,8 +101,8 @@ class MultiplicationPractice {
         
         // Generate all possible combinations that haven't been used yet (2 to 10)
         for (let i = this.minNumber; i <= this.maxNumber; i++) {
-            for (let j = this.minNumber; j <= this.maxNumber; j++) {
-                const combination = `${i}x${j}`;
+            for (let j = i; j <= this.maxNumber; j++) {  // Start j from i to avoid duplicates
+                const combination = `${Math.min(i,j)}x${Math.max(i,j)}`; // Store in sorted order
                 if (!this.usedCombinations.has(combination)) {
                     availableCombinations.push([i, j]);
                 }
@@ -77,12 +119,14 @@ class MultiplicationPractice {
         const randomIndex = Math.floor(Math.random() * availableCombinations.length);
         const [num1, num2] = availableCombinations[randomIndex];
         
-        // Mark this combination as used
-        this.usedCombinations.add(`${num1}x${num2}`);
+        // Mark this combination as used (in sorted order)
+        this.usedCombinations.add(`${Math.min(num1,num2)}x${Math.max(num1,num2)}`);
         
+        // Randomly decide if we should swap the numbers for display
+        const shouldSwap = Math.random() < 0.5;
         return {
-            num1,
-            num2,
+            num1: shouldSwap ? num2 : num1,
+            num2: shouldSwap ? num1 : num2,
             answer: num1 * num2,
             userAnswer: null,
             isChecked: false
@@ -250,9 +294,4 @@ class MultiplicationPractice {
             this.nextButton.addEventListener('click', () => this.checkAndNext());
         });
     }
-}
-
-// Initialize the practice when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    new MultiplicationPractice();
-}); 
+} 
