@@ -45,7 +45,7 @@ class MultiplicationPractice {
         this.currentTaskIndex = 0;
         this.totalTasks = 12;
         this.problems = [];
-        this.timeLimit = 8; // 8 seconds per problem
+        this.timeLimit = 20; // 20 seconds per problem
         this.timer = null;
         this.usedCombinations = new Set(); // Track used combinations
         this.minNumber = 2; // Starting from 2 instead of 1
