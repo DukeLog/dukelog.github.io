@@ -203,8 +203,6 @@ class MultiplicationPractice {
     }
 
     checkAndNext() {
-        clearInterval(this.timer);
-        
         const input = this.currentTaskElement.querySelector('input');
         const userAnswer = parseInt(input.value);
         
@@ -214,7 +212,7 @@ class MultiplicationPractice {
             input.focus();
             return;
         }
-
+        clearInterval(this.timer);
         const problem = this.problems[this.currentTaskIndex];
         problem.userAnswer = userAnswer;
         problem.isChecked = true;
