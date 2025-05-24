@@ -46,6 +46,7 @@ class MultiplicationPractice {
         this.totalTasks = 12;
         this.problems = [];
         this.timeLimit = 40; // 20 seconds per problem
+        this.remainingTime = this.timeLimit; // Track remaining time for pause/resume
         this.timer = null;
         this.usedCombinations = new Set(); // Track used combinations
         this.minNumber = 2; // Starting from 2 instead of 1
@@ -136,6 +137,7 @@ class MultiplicationPractice {
     generateNewProblems() {
         this.problems = [];
         this.currentTaskIndex = 0;
+        this.remainingTime = this.timeLimit; // Reset timer for new problems
         this.usedCombinations.clear(); // Clear used combinations for new set
         
         for (let i = 0; i < this.totalTasks; i++) {
@@ -149,24 +151,27 @@ class MultiplicationPractice {
     }
 
     startTimer() {
-        let timeLeft = this.timeLimit;
-        this.timerElement.textContent = timeLeft;
+        this.timerElement.textContent = this.remainingTime;
         this.timerElement.classList.remove('warning');
         
         clearInterval(this.timer);
         this.timer = setInterval(() => {
-            timeLeft--;
-            this.timerElement.textContent = timeLeft;
+            this.remainingTime--;
+            this.timerElement.textContent = this.remainingTime;
             
-            if (timeLeft <= 2) {
+            if (this.remainingTime <= 2) {
                 this.timerElement.classList.add('warning');
             }
             
-            if (timeLeft <= 0) {
+            if (this.remainingTime <= 0) {
                 clearInterval(this.timer);
                 this.handleTimeUp();
             }
         }, 1000);
+    }
+
+    pauseTimer() {
+        clearInterval(this.timer);
     }
 
     handleTimeUp() {
@@ -203,16 +208,19 @@ class MultiplicationPractice {
     }
 
     checkAndNext() {
+        this.pauseTimer();
+        
         const input = this.currentTaskElement.querySelector('input');
         const userAnswer = parseInt(input.value);
         
         if (isNaN(userAnswer)) {
             alert('Please enter a number!');
+            this.startTimer(); // Resume with remaining time
             input.value = '';
             input.focus();
             return;
         }
-        clearInterval(this.timer);
+
         const problem = this.problems[this.currentTaskIndex];
         problem.userAnswer = userAnswer;
         problem.isChecked = true;
@@ -227,6 +235,7 @@ class MultiplicationPractice {
         setTimeout(() => {
             if (this.currentTaskIndex < this.totalTasks - 1) {
                 this.currentTaskIndex++;
+                this.remainingTime = this.timeLimit; // Reset timer for next problem
                 this.updateUI();
                 this.startTimer();
                 this.focusInput();
