@@ -210,7 +210,6 @@ class MultiplicationPractice {
         
         if (isNaN(userAnswer)) {
             alert('Please enter a number!');
-            this.startTimer(); // Restart the timer if input was invalid
             input.value = '';
             input.focus();
             return;
