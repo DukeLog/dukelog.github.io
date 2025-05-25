@@ -23,20 +23,16 @@ extract-files:
 	docker cp temp-container:/app/dist ./
 	docker rm temp-container || true
 
-# Clean build artifacts
+# Clean all build artifacts and temporary files
 clean:
-	@echo "Cleaning build artifacts..."
+	@echo "Cleaning build artifacts and temporary files..."
 	rm -rf dist/
-	docker rmi math-practice-builder 2>/dev/null || true
-	docker rm temp-container 2>/dev/null || true
-
-# Clean temporary files from root after deployment
-clean-root:
-	@echo "Cleaning temporary files from root directory..."
 	rm -f *.d.ts *.js.map
 	rm -rf node_modules/ 2>/dev/null || true
 	rm -f package-lock.json 2>/dev/null || true
-	@echo "Root directory cleaned of temporary files."
+	docker rmi math-practice-builder 2>/dev/null || true
+	docker rm temp-container 2>/dev/null || true
+	@echo "All artifacts and temporary files cleaned."
 
 # Deploy to GitHub Pages root (interactive)
 deploy: build
@@ -60,10 +56,7 @@ backup-and-deploy:
 	@echo "Deploying new files..."
 	cp dist/* ./
 	@echo "Cleaning up temporary files..."
-	rm -rf dist/
-	rm -f *.d.ts *.js.map
-	rm -rf node_modules/ 2>/dev/null || true
-	rm -f package-lock.json 2>/dev/null || true
+	$(MAKE) clean
 	@echo "Files deployed to root directory and temporary files cleaned up."
 	@echo "You can now commit and push to GitHub."
 
@@ -85,8 +78,7 @@ serve: build
 help:
 	@echo "Available targets:"
 	@echo "  build         - Build the project using Docker"
-	@echo "  clean         - Clean build artifacts and Docker images"
-	@echo "  clean-root    - Clean temporary files from root directory"
+	@echo "  clean         - Clean all build artifacts and temporary files"
 	@echo "  deploy        - Build and deploy to GitHub Pages (interactive)"
 	@echo "  deploy-force  - Build and deploy without confirmation"
 	@echo "  dev           - Start development mode with file watching"
