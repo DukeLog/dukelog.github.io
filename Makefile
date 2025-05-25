@@ -63,11 +63,6 @@ backup-and-deploy:
 # Force deploy without confirmation
 deploy-force: build backup-and-deploy
 
-# Development mode with file watching
-dev:
-	@echo "Starting development mode..."
-	docker run --rm -v $$(pwd):/app -w /app node:18-alpine sh -c "npm install && npm run dev"
-
 # Serve built files on port 8080
 serve: build
 	@echo "Starting development server on http://localhost:8080..."
@@ -81,6 +76,5 @@ help:
 	@echo "  clean         - Clean all build artifacts and temporary files"
 	@echo "  deploy        - Build and deploy to GitHub Pages (interactive)"
 	@echo "  deploy-force  - Build and deploy without confirmation"
-	@echo "  dev           - Start development mode with file watching"
 	@echo "  serve         - Build and start development server on port 8080"
 	@echo "  help          - Show this help message" 
