@@ -28,6 +28,7 @@ clean:
 	@echo "Cleaning build artifacts and temporary files..."
 	rm -rf dist/
 	rm -f *.d.ts *.js.map
+	rm -f app.js QuizUIManager.js MultiplicationTaskGenerator.js DivisionTaskGenerator.js types.js
 	rm -rf node_modules/ 2>/dev/null || true
 	rm -f package-lock.json 2>/dev/null || true
 	docker rmi math-practice-builder 2>/dev/null || true
