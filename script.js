@@ -470,6 +470,7 @@ class DivisionPractice extends QuizPractice {
             'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?w=400', // Pug close-up
             'https://images.unsplash.com/photo-1530041539828-114de669390e?w=400', // Pug portrait
             'https://images.unsplash.com/photo-1593134257782-e89567b7718a?w=400', // Funny pug
+            'https://st4.depositphotos.com/7863750/38907/i/1600/depositphotos_389076072-stock-photo-pug-dog-unicorn-eating-rainbow.jpg'
         ];
     }
 
