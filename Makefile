@@ -30,6 +30,14 @@ clean:
 	docker rmi math-practice-builder 2>/dev/null || true
 	docker rm temp-container 2>/dev/null || true
 
+# Clean temporary files from root after deployment
+clean-root:
+	@echo "Cleaning temporary files from root directory..."
+	rm -f *.d.ts *.js.map
+	rm -rf node_modules/ 2>/dev/null || true
+	rm -f package-lock.json 2>/dev/null || true
+	@echo "Root directory cleaned of temporary files."
+
 # Deploy to GitHub Pages root (interactive)
 deploy: build
 	@if [ -d ".git" ] && git remote get-url origin | grep -q "dukelog.github.io"; then \
@@ -51,7 +59,13 @@ backup-and-deploy:
 	cp styles.css backup_old/ 2>/dev/null || true
 	@echo "Deploying new files..."
 	cp dist/* ./
-	@echo "Files deployed to root directory. You can now commit and push to GitHub."
+	@echo "Cleaning up temporary files..."
+	rm -rf dist/
+	rm -f *.d.ts *.js.map
+	rm -rf node_modules/ 2>/dev/null || true
+	rm -f package-lock.json 2>/dev/null || true
+	@echo "Files deployed to root directory and temporary files cleaned up."
+	@echo "You can now commit and push to GitHub."
 
 # Force deploy without confirmation
 deploy-force: build backup-and-deploy
@@ -72,6 +86,7 @@ help:
 	@echo "Available targets:"
 	@echo "  build         - Build the project using Docker"
 	@echo "  clean         - Clean build artifacts and Docker images"
+	@echo "  clean-root    - Clean temporary files from root directory"
 	@echo "  deploy        - Build and deploy to GitHub Pages (interactive)"
 	@echo "  deploy-force  - Build and deploy without confirmation"
 	@echo "  dev           - Start development mode with file watching"
