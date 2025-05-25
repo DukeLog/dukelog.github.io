@@ -1,0 +1,17 @@
+{
+  "name": "math-practice-ts",
+  "version": "1.0.0",
+  "description": "TypeScript-based math practice application",
+  "main": "dist/app.js",
+  "scripts": {
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "cp src/index.html dist/ && cp src/styles.css dist/ && cp table.png dist/",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0"
+  },
+  "dependencies": {}
+} 
