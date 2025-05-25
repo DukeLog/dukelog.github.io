@@ -35,34 +35,37 @@ clean:
 	docker rm temp-container 2>/dev/null || true
 	@echo "All artifacts and temporary files cleaned."
 
-# Deploy to GitHub Pages root (interactive)
-deploy: build
+# Complete deployment workflow: build -> deploy -> commit -> clean
+deploy:
+	@echo "=== Starting deployment workflow ==="
+	@echo "Step 1: Building project..."
+	$(MAKE) build
+	@echo ""
+	@echo "Step 2: Deploying to root directory..."
 	@if [ -d ".git" ] && git remote get-url origin | grep -q "dukelog.github.io"; then \
 		echo "Detected GitHub Pages repository."; \
-		read -p "Do you want to deploy to root? (y/n): " response; \
-		if [ "$$response" = "y" ] || [ "$$response" = "Y" ]; then \
-			$(MAKE) backup-and-deploy; \
+		echo "Copying built files to root..."; \
+		cp dist/* ./; \
+		echo ""; \
+		echo "Step 3: Git commit and push..."; \
+		read -p "Commit and push changes to GitHub? (y/n): " git_response; \
+		if [ "$$git_response" = "y" ] || [ "$$git_response" = "Y" ]; then \
+			git add .; \
+			git commit -m "Deploy TypeScript version - $$(date '+%Y-%m-%d %H:%M')"; \
+			git push origin main; \
+			echo "Successfully pushed to GitHub!"; \
+		else \
+			echo "Skipped git commit/push. You can manually commit later."; \
 		fi; \
 	else \
 		echo "Not a GitHub Pages repository or no git remote found."; \
 	fi
-
-# Backup old files and deploy new ones
-backup-and-deploy:
-	@echo "Backing up original files..."
-	mkdir -p backup_old
-	cp index.html backup_old/ 2>/dev/null || true
-	cp script.js backup_old/ 2>/dev/null || true
-	cp styles.css backup_old/ 2>/dev/null || true
-	@echo "Deploying new files..."
-	cp dist/* ./
-	@echo "Cleaning up temporary files..."
+	@echo ""
+	@echo "Step 4: Cleaning up temporary files..."
 	$(MAKE) clean
-	@echo "Files deployed to root directory and temporary files cleaned up."
-	@echo "You can now commit and push to GitHub."
+	@echo "=== Deployment workflow complete ==="
 
-# Force deploy without confirmation
-deploy-force: build backup-and-deploy
+
 
 # Serve built files on port 8080
 serve: build
@@ -75,7 +78,6 @@ help:
 	@echo "Available targets:"
 	@echo "  build         - Build the project using Docker"
 	@echo "  clean         - Clean all build artifacts and temporary files"
-	@echo "  deploy        - Build and deploy to GitHub Pages (interactive)"
-	@echo "  deploy-force  - Build and deploy without confirmation"
+	@echo "  deploy        - Complete deployment: build -> deploy -> commit -> clean"
 	@echo "  serve         - Build and start development server on port 8080"
 	@echo "  help          - Show this help message" 
