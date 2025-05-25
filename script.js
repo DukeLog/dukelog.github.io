@@ -374,30 +374,65 @@ class MultiplicationPractice extends QuizPractice {
     }
 
     generateNewProblem() {
-        const availableCombinations = [];
+        // Ensure properties are set (fallback for constructor timing issues)
+        const minNum = this.minNumber || 2;
+        const maxNum = this.maxNumber || 10;
         
-        // Generate all possible combinations that haven't been used yet (2 to 10)
-        for (let i = this.minNumber; i <= this.maxNumber; i++) {
-            for (let j = i; j <= this.maxNumber; j++) {  // Start j from i to avoid duplicates
-                const combination = `${Math.min(i,j)}x${Math.max(i,j)}`; // Store in sorted order
-                if (!this.usedCombinations.has(combination)) {
+        let availableCombinations = [];
+        
+        // Generate all possible unique combinations (2 to 10)
+        for (let i = minNum; i <= maxNum; i++) {
+            for (let j = i; j <= maxNum; j++) {
+                const combinationKey = `${i}x${j}`;
+                if (!this.usedCombinations.has(combinationKey)) {
                     availableCombinations.push([i, j]);
                 }
             }
         }
 
-        // If all combinations were used, reset the used combinations
+        // If we've used all combinations, reset and regenerate
         if (availableCombinations.length === 0) {
             this.usedCombinations.clear();
-            return this.generateNewProblem();
+            for (let i = minNum; i <= maxNum; i++) {
+                for (let j = i; j <= maxNum; j++) {
+                    availableCombinations.push([i, j]);
+                }
+            }
         }
 
-        // Pick a random combination from available ones
+        // Safety check to ensure we have valid combinations
+        if (availableCombinations.length === 0) {
+            console.error('No available combinations found! Using fallback.');
+            return {
+                num1: 2,
+                num2: 3,
+                answer: 6,
+                userAnswer: null,
+                isChecked: false
+            };
+        }
+
+        // Pick a random combination
         const randomIndex = Math.floor(Math.random() * availableCombinations.length);
-        const [num1, num2] = availableCombinations[randomIndex];
+        const selectedCombination = availableCombinations[randomIndex];
         
-        // Mark this combination as used (in sorted order)
-        this.usedCombinations.add(`${Math.min(num1,num2)}x${Math.max(num1,num2)}`);
+        // Safety check for valid selection
+        if (!selectedCombination || !Array.isArray(selectedCombination) || selectedCombination.length < 2) {
+            console.error('Invalid combination selected:', selectedCombination, 'from index:', randomIndex, 'array length:', availableCombinations.length);
+            return {
+                num1: 2,
+                num2: 3,
+                answer: 6,
+                userAnswer: null,
+                isChecked: false
+            };
+        }
+        
+        const [num1, num2] = selectedCombination;
+        
+        // Mark this combination as used
+        const combinationKey = `${num1}x${num2}`;
+        this.usedCombinations.add(combinationKey);
         
         // Randomly decide if we should swap the numbers for display
         const shouldSwap = Math.random() < 0.5;
